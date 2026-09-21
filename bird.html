@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Bird 小游戏</title>
+    <style>
+        * {
+            margin:0;
+            padding:0;
+            box-sizing: border-box;
+        }
+        body{
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            background:#0f1419;
+            padding-top:20px;
+            font-family:Microsoft Yahei, sans-serif;
+            color:white;
+        }
+        canvas{
+            border:2px solid #ffc145;
+            background:#121a24;
+            border-radius:8px;
+        }
+        .tip{
+            margin-top:12px;
+            color:#aaa;
+        }
+    </style>
+</head>
+<body>
+<canvas id="gameCanvas" width="400" height="600"></canvas>
+<div class="tip">点击画布 / 按空格键 控制小鸟向上飞</div>
+
+<script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    //小鸟数据
+    let bird = {
+        x: 80,
+        y: 300,
+        size: 24,
+        velocity:0,
+        gravity:0.45,
+        jumpPower:-9
+    }
+
+    //管道
+    let pipes = [];
+    const pipeWidth = 60;
+    const pipeGap = 160;
+    let pipeSpeed = 3;
+    let score = 0;
+    let gameOver = false;
+
+    //生成管道
+    function createPipe(){
+        const topHeight = Math.random() * (canvas.height - pipeGap - 120) + 40;
+        pipes.push({
+            x: canvas.width,
+            topH: topHeight,
+            bottomY: topHeight + pipeGap
+        })
+    }
+
+    //跳跃
+    function jump(){
+        if(gameOver){
+            resetGame();
+            return;
+        }
+        bird.velocity = bird.jumpPower;
+    }
+
+    //监听点击 和 空格
+    canvas.addEventListener("click", jump);
+    document.addEventListener("keydown", (e)=>{
+        if(e.code === "Space") jump();
+    })
+
+    function resetGame(){
+        bird.y = 300;
+        bird.velocity = 0;
+        pipes = [];
+        score = 0;
+        gameOver = false;
+    }
+
+    function draw(){
+        //清空画布
+        ctx.clearRect(0,0,canvas.width, canvas.height);
+
+        //绘制小鸟（黄色方块代替小鸟，简单）
+        ctx.fillStyle="#ffc145";
+        ctx.beginPath();
+        ctx.arc(bird.x, bird.y, bird.size,0,Math.PI*2);
+        ctx.fill();
+
+        //更新小鸟
+        bird.velocity += bird.gravity;
+        bird.y += bird.velocity;
+
+        //管道循环
+        for(let i = pipes.length -1; i >=0; i--){
+            const p = pipes[i];
+            p.x -= pipeSpeed;
+
+            //画上管道
+            ctx.fillStyle="#7b2cbf";
+            ctx.fillRect(p.x,0,pipeWidth,p.topH);
+            //画下管道
+            ctx.fillRect(p.x, p.bottomY, pipeWidth, canvas.height - p.bottomY);
+
+            //移出屏幕删除管道，加分
+            if(p.x + pipeWidth < 0){
+                pipes.splice(i,1);
+                score +=1;
+            }
+
+            //碰撞检测
+            if(
+                bird.x + bird.size > p.x
+                && bird.x - bird.size < p.x + pipeWidth
+            ){
+                if(bird.y - bird.size < p.topH || bird.y + bird.size > p.bottomY){
+                    gameOver = true;
+                }
+            }
+        }
+
+        //边界碰撞 上下撞墙
+        if(bird.y + bird.size > canvas.height || bird.y - bird.size < 0){
+            gameOver = true;
+        }
+
+        //分数文字
+        ctx.fillStyle="#fff";
+        ctx.font="28px Microsoft Yahei";
+        ctx.fillText("分数："+score, 20,40);
+
+        if(gameOver){
+            ctx.fillStyle="#ff4d4d";
+            ctx.font="32px Microsoft Yahei";
+            ctx.textAlign="center";
+            ctx.fillText("游戏结束！点击重新开始", canvas.width/2, canvas.height/2);
+        }
+    }
+
+    //定时生成管道
+    setInterval(()=>{
+        if(!gameOver) createPipe();
+    },1400)
+
+    //游戏循环
+    function loop(){
+        draw();
+        requestAnimationFrame(loop);
+    }
+    loop();
+</script>
+</body>
+</html>
