@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>有没有想我</title>
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+        body{
+            /*页面居中*/
+            height:100vh;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            background-color: #fff0f5;
+            font-size:28px;
+        }
+        .tip-text{
+            margin-bottom: 40px;
+            color:#c84b78;
+        }
+        .btn-box{
+            display:flex;
+            gap:30px;
+        }
+        button{
+            width:140px;
+            height:60px;
+            font-size:22px;
+            border:none;
+            border-radius:12px;
+            cursor:pointer;
+        }
+        #yesBtn{
+            background:#ff6b8b;
+            color:white;
+        }
+        #noBtn{
+            background:#dddddd;
+        }
+    </style>
+</head>
+<body>
+<div class="tip-text">宝贝，有没有想我？</div>
+<div class="btn-box" id="btnContainer">
+    <button id="yesBtn">想</button>
+    <button id="noBtn">不想</button>
+</div>
+
+<script>
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn = document.getElementById('noBtn');
+    const container = document.getElementById('btnContainer');
+
+    // 点击【想】弹出消息
+    yesBtn.onclick = function(){
+        alert("我也想你❤️");
+    }
+
+    // 点击【不想】交换两个按钮
+    noBtn.onclick = function(){
+        // 交换DOM顺序
+        if(container.firstChild === yesBtn){
+            container.prepend(noBtn);
+        }else{
+            container.prepend(yesBtn);
+        }
+    }
+</script>
+</body>
+</html>
