@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>狂徒皮肤PK淘汰赛</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            min-height: 100vh;
+            background-color: #12121b;
+            color: #fff;
+            font-family: "Microsoft Yahei",sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding:20px;
+        }
+        .title{
+            font-size:28px;
+            margin-bottom:12px;
+            color:#ffc145;
+        }
+        .progress{
+            font-size:18px;
+            margin-bottom:40px;
+            color:#cccccc;
+        }
+        .container{
+            display:flex;
+            gap:32px;
+        }
+        .skin-btn{
+            width:260px;
+            height:160px;
+            font-size:22px;
+            border-radius:14px;
+            border: 2px solid #444;
+            background:#202035;
+            color:white;
+            cursor:pointer;
+            transition: all 0.25s;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            padding:10px;
+        }
+        .skin-btn:hover{
+            border-color:#ffc145;
+            background:#2c2c44;
+            transform: scale(1.04);
+        }
+        .tier-tag{
+            font-size:14px;
+            margin-top:8px;
+            opacity:0.75;
+        }
+        .result-box{
+            text-align:center;
+        }
+        .final-name{
+            font-size:36px;
+            color:#ffc145;
+            margin:20px 0;
+        }
+        .restart-btn{
+            margin-top:20px;
+            padding:12px 24px;
+            font-size:18px;
+            border-radius:8px;
+            background:#ffc145;
+            border:none;
+            cursor:pointer;
+            color:#111;
+        }
+    </style>
+</head>
+<body>
+<div class="title">无畏契约狂徒皮肤二选一淘汰赛</div>
+<div class="progress" id="progressText"></div>
+<div class="container" id="box">
+    <button class="skin-btn" id="btnA"></button>
+    <button class="skin-btn" id="btnB"></button>
+</div>
+
+<script>
+    // 全部狂徒皮肤，只保留 终极/传奇/卓越
+    const allSkinList = [
+        {name:"上古龙焱 狂徒", tier:"终极"},
+        {name:"混沌序曲 狂徒", tier:"终极"},
+        {name:"艾沃莉的梦之翼 狂徒", tier:"终极"},
+        {name:"创纪元 狂徒", tier:"终极"},
+        {name:"掠夺印象 狂徒", tier:"传奇"},
+        {name:"紫金 狂徒", tier:"传奇"},
+        {name:"RGX 11Z PRO 狂徒", tier:"传奇"},
+        {name:"盖亚的复仇 狂徒", tier:"传奇"},
+        {name:"光明哨兵 狂徒", tier:"传奇"},
+        {name:"奇点 狂徒", tier:"传奇"},
+        {name:"离子圣芒 狂徒", tier:"传奇"},
+        {name:"堕天遗武 狂徒", tier:"传奇"},
+        {name:"塑水宗 狂徒", tier:"卓越"},
+        {name:"时空裂隙 狂徒", tier:"卓越"},
+        {name:"荒麟道 狂徒", tier:"卓越"},
+        {name:"源能 狂徒", tier:"卓越"},
+        {name:"千灵华绽 狂徒", tier:"卓越"},
+    ];
+
+    // 当前存活候选池
+    let candidates = [];
+    // 当前PK的胜者
+    let currentWinner = null;
+    let index = 1;
+
+    // 洗牌打乱数组
+    function shuffle(arr){
+        const newArr = [...arr];
+        for(let i=newArr.length-1;i>0;i--){
+            const r = Math.floor(Math.random()*(i+1));
+            [newArr[i], newArr[r]] = [newArr[r], newArr[i]];
+        }
+        return newArr;
+    }
+
+    function startGame(){
+        candidates = shuffle(allSkinList);
+        currentWinner = candidates.shift();
+        index = 1;
+        renderBattle();
+    }
+
+    function renderBattle(){
+        // 全部比完，输出冠军
+        if(candidates.length === 0){
+            document.getElementById("box").innerHTML = `
+                    <div class="result-box">
+                        <div>🎉 最终选出你最爱的狂徒皮肤！</div>
+                        <div class="final-name">${currentWinner.name}</div>
+                        <div>品质：${currentWinner.tier}</div>
+                        <button class="restart-btn" onclick="startGame()">重新PK</button>
+                    </div>
+                `;
+            return;
+        }
+        // 拿出下一个对手
+        const challenger = candidates.shift();
+        document.getElementById("progressText")
+            .innerText = `第${index}轮PK | 剩余待对比: ${candidates.length}`;
+
+        const btnA = document.getElementById("btnA");
+        const btnB = document.getElementById("btnB");
+
+        btnA.innerHTML = `${currentWinner.name}<div class="tier-tag">【${currentWinner.tier}】</div>`;
+        btnB.innerHTML = `${challenger.name}<div class="tier-tag">【${challenger.tier}】</div>`;
+
+        // 点击A：胜者保留，继续
+        btnA.onclick = ()=>{
+            currentWinner = currentWinner;
+            index++;
+            renderBattle();
+        }
+        // 点击B：挑战者获胜
+        btnB.onclick = ()=>{
+            currentWinner = challenger;
+            index++;
+            renderBattle();
+        }
+    }
+    startGame();
+</script>
+</body>
+</html>
